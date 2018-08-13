@@ -1,0 +1,51 @@
+Configutation:
+  name: Default
+
+  Properties:
+    Property:
+      name: log-path
+      value: "logs"
+
+  Appenders:
+
+    Console:
+      name: Console_Appender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${sys:PID} --- [%15.15t] %-40.40c{1.} : %m%n"
+
+    File:
+      name: File_Appender
+      fileName: ${log-path}/logfile.log
+      PatternLayout:
+        pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${sys:PID} --- [%15.15t] %-40.40c{1.} : %m%n"
+
+    RollingFile:
+      - name: RollingFile_Appender
+        fileName: ${log-path}/rollingfile.log
+        filePattern: "logs/archive/rollingfile.log.%d{yyyy-MM-dd-hh-mm}.gz"
+        PatternLayout:
+          pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${sys:PID} --- [%15.15t] %-40.40c{1.} : %m%n"
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 1 GB
+        DefaultRollOverStrategy:
+          max: 30
+
+  # Refer: https://github.com/spring-projects/spring-boot/blob/v2.0.3.RELEASE/spring-boot-project/spring-boot/src/main/resources/org/springframework/boot/logging/log4j2/log4j2.xml
+  Loggers:
+      Root:
+        level: info
+        AppenderRef:
+          - ref: Console_Appender
+      Logger:
+        - name: io.terminus.template
+          additivity: false
+          level: info
+          AppenderRef:
+            - ref: Console_Appender
+              level: info
+            - ref: File_Appender
+              level: info
+            - ref: RollingFile_Appender
+              level: debug
